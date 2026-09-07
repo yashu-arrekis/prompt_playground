@@ -14,18 +14,37 @@ except FileNotFoundError as error:
 except json.JSONDecodeError as e:
     convo_hist=[]
 
-joined_hist = ""
-for convo in convo_hist[-3:]:
-    joined_hist = joined_hist + "User: " + convo.get("user_prompt")
-    joined_hist = joined_hist + "\nAI: " + convo.get("AI_response")
+response_schema ={
+        "type" : "object",
+        "properties" : {
+            "answer" :{
+                    "type" : "string"
+                },
+                "topic" :{
+                    "type" : "string"
+                },
+                "difficulty" :{
+                    "type" : "string"
+                }
+        },
+        "required" :[
+            "answer",
+            "topic",
+            "difficulty"
+        ]
+    }
 
 while True:
     print("Hii, i am gemini")
     print("To enter prompt select option 1")
     print("To exit select option 2")
     print("To clear convo history select 3")
-    #recent_hist= convo_hist[-3:]
-    #joined_hist = str(convo_hist[-3:])
+
+    joined_hist = ""
+    for convo in convo_hist[-3:]:
+        joined_hist = joined_hist + "User: " + convo.get("user_prompt")
+        joined_hist = joined_hist + "\nAI: " + convo.get("AI_response").get("answer")
+    
     try:
         option = int(input("Enter your option: "))
     except ValueError:
@@ -37,14 +56,17 @@ while True:
         response = client.models.generate_content(
             model=type_of_model,
             contents= "system_instructions : \n" + system_instructions + "\nPrevious_chat:\n"+ joined_hist + "\nuser_prompt :\n" + user_prompt,
-            config={"response_mime_type": "application/json"}
+            config={
+                    "response_mime_type": "application/json",
+                    "response_schema" : response_schema
+                    }
         )
         data=json.loads(response.text)
         print(data["answer"])
         print(data["topic"])
         print(data["difficulty"])
         print("--------------------")
-        #convo_hist.append("user_prompt: "+ user_prompt + "AI_response: " + response.text)
+
         in_dict ={}
         in_dict["user_prompt"] = user_prompt
         in_dict["AI_response"] = data
@@ -56,5 +78,6 @@ while True:
     else:
         print("Please enter a valid number either 1 nor 2 or 3.")
 
+    
 with open("conversation_history.json", "w", encoding="utf-8") as json_file:
     json.dump(convo_hist, json_file, indent=4, ensure_ascii=False)
