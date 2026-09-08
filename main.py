@@ -78,6 +78,25 @@ while True:
     else:
         print("Please enter a valid number either 1 nor 2 or 3.")
 
-    
 with open("conversation_history.json", "w", encoding="utf-8") as json_file:
     json.dump(convo_hist, json_file, indent=4, ensure_ascii=False)
+
+difficulty ={
+    "beginner",
+    "intermediate",
+    "advanced"
+}
+if "answer" not in data:
+    print("key not exists")
+elif not data["answer"]:
+    print("value is empty")
+if "topic" not in data:
+    print("Key not exists")
+elif not data["topic"]:
+    print("value is empty")
+if "difficulty" not in data:
+    print("Key not exists")
+elif not data["difficulty"]:
+    print("value is empty")
+elif data["difficulty"] not in difficulty:
+    print("Wrong difficulty is entered")
