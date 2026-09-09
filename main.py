@@ -33,6 +33,36 @@ response_schema ={
             "difficulty"
         ]
     }
+difficulty ={
+    "beginner",
+    "intermediate",
+    "advanced"
+}
+def validate_output(data):
+    if "answer" not in data:
+        print("key not exists")
+        return False
+    elif not data["answer"]:
+        print("value is empty")
+        return False
+    if "topic" not in data:
+        print("Key not exists")
+        return False
+    elif not data["topic"]:
+        print("value is empty")
+        return False
+    if "difficulty" not in data:
+        print("Key not exists")
+        return False
+    elif not data["difficulty"]:
+        print("value is empty")
+        return False
+    elif data["difficulty"] not in difficulty:
+        print("Wrong difficulty is entered")
+        return False
+
+    return True
+
 
 while True:
     print("Hii, i am gemini")
@@ -67,35 +97,6 @@ while True:
         print(data["difficulty"])
         print("--------------------")
 
-        difficulty ={
-            "beginner",
-            "intermediate",
-            "advanced"
-        }
-        def validate_output(data):
-            if "answer" not in data:
-                print("key not exists")
-                return False
-            elif not data["answer"]:
-                print("value is empty")
-                return False
-            if "topic" not in data:
-                print("Key not exists")
-                return False
-            elif not data["topic"]:
-                print("value is empty")
-                return False
-            if "difficulty" not in data:
-                print("Key not exists")
-                return False
-            elif not data["difficulty"]:
-                print("value is empty")
-                return False
-            elif data["difficulty"] not in difficulty:
-                print("Wrong difficulty is entered")
-                return False
-
-            return True
         is_valid = validate_output(data)
 
         in_dict ={}
@@ -115,34 +116,5 @@ while True:
 with open("conversation_history.json", "w", encoding="utf-8") as json_file:
     json.dump(convo_hist, json_file, indent=4, ensure_ascii=False)
 
-difficulty ={
-    "beginner",
-    "intermediate",
-    "advanced"
-}
-def validate_output(data):
-    if "answer" not in data:
-        print("key not exists")
-        return False
-    elif not data["answer"]:
-        print("value is empty")
-        return False
-    if "topic" not in data:
-        print("Key not exists")
-        return False
-    elif not data["topic"]:
-        print("value is empty")
-        return False
-    if "difficulty" not in data:
-        print("Key not exists")
-        return False
-    elif not data["difficulty"]:
-        print("value is empty")
-        return False
-    elif data["difficulty"] not in difficulty:
-        print("Wrong difficulty is entered")
-        return False
-
-    return True
 
 
