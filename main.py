@@ -33,6 +33,24 @@ response_schema ={
             "difficulty"
         ]
     }
+
+def get_ai_response(type_of_model,user_prompt,response_schema, system_instructions, joined_hist):
+    try:
+        response = client.models.generate_content(
+            model=type_of_model,
+            contents= "system_instructions : \n" + system_instructions + "\nPrevious_chat:\n"+ joined_hist + "\nuser_prompt :\n" + user_prompt,
+            config={
+                "response_mime_type": "application/json",
+                "response_schema" : response_schema
+            }
+        )
+        data=json.loads(response.text)
+        return True, data
+    except Exception as e:
+        print(f"Gemini api caused an error is {e}")
+        return False, None
+
+
 difficulty ={
     "beginner",
     "intermediate",
@@ -83,24 +101,15 @@ while True:
 
     if option ==1:
         user_prompt = input("Enter your prompt: ")
-        try:
-            response = client.models.generate_content(
-                model=type_of_model,
-                contents= "system_instructions : \n" + system_instructions + "\nPrevious_chat:\n"+ joined_hist + "\nuser_prompt :\n" + user_prompt,
-                config={
-                        "response_mime_type": "application/json",
-                        "response_schema" : response_schema
-                        }
-            )
-            data=json.loads(response.text)
-        except Exception as e:
-            print(f"Gemini api caused an error is {e}")
+        is_success, data = get_ai_response(type_of_model, user_prompt, response_schema, system_instructions, joined_hist)
+        if is_success == True:
+            print(data["answer"])
+            print(data["topic"])
+            print(data["difficulty"])
+            print("--------------------")
+        else:
+            print("something went wrong from api's side")
             continue
-
-        print(data["answer"])
-        print(data["topic"])
-        print(data["difficulty"])
-        print("--------------------")
 
         is_valid = validate_output(data)
 
