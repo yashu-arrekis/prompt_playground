@@ -83,15 +83,20 @@ while True:
 
     if option ==1:
         user_prompt = input("Enter your prompt: ")
-        response = client.models.generate_content(
-            model=type_of_model,
-            contents= "system_instructions : \n" + system_instructions + "\nPrevious_chat:\n"+ joined_hist + "\nuser_prompt :\n" + user_prompt,
-            config={
-                    "response_mime_type": "application/json",
-                    "response_schema" : response_schema
-                    }
-        )
-        data=json.loads(response.text)
+        try:
+            response = client.models.generate_content(
+                model=type_of_model,
+                contents= "system_instructions : \n" + system_instructions + "\nPrevious_chat:\n"+ joined_hist + "\nuser_prompt :\n" + user_prompt,
+                config={
+                        "response_mime_type": "application/json",
+                        "response_schema" : response_schema
+                        }
+            )
+            data=json.loads(response.text)
+        except Exception as e:
+            print(f"Gemini api caused an error is {e}")
+            continue
+
         print(data["answer"])
         print(data["topic"])
         print(data["difficulty"])
@@ -115,6 +120,4 @@ while True:
 
 with open("conversation_history.json", "w", encoding="utf-8") as json_file:
     json.dump(convo_hist, json_file, indent=4, ensure_ascii=False)
-
-
 
