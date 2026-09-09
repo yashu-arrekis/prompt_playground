@@ -67,10 +67,44 @@ while True:
         print(data["difficulty"])
         print("--------------------")
 
+        difficulty ={
+            "beginner",
+            "intermediate",
+            "advanced"
+        }
+        def validate_output(data):
+            if "answer" not in data:
+                print("key not exists")
+                return False
+            elif not data["answer"]:
+                print("value is empty")
+                return False
+            if "topic" not in data:
+                print("Key not exists")
+                return False
+            elif not data["topic"]:
+                print("value is empty")
+                return False
+            if "difficulty" not in data:
+                print("Key not exists")
+                return False
+            elif not data["difficulty"]:
+                print("value is empty")
+                return False
+            elif data["difficulty"] not in difficulty:
+                print("Wrong difficulty is entered")
+                return False
+
+            return True
+        is_valid = validate_output(data)
+
         in_dict ={}
         in_dict["user_prompt"] = user_prompt
-        in_dict["AI_response"] = data
-        convo_hist.append(in_dict)
+        if is_valid == True:
+            in_dict["AI_response"] = data
+            convo_hist.append(in_dict)
+        else:
+            print("Something went wrong in validation")
     elif option == 2:
         break
     elif option == 3:
@@ -86,17 +120,29 @@ difficulty ={
     "intermediate",
     "advanced"
 }
-if "answer" not in data:
-    print("key not exists")
-elif not data["answer"]:
-    print("value is empty")
-if "topic" not in data:
-    print("Key not exists")
-elif not data["topic"]:
-    print("value is empty")
-if "difficulty" not in data:
-    print("Key not exists")
-elif not data["difficulty"]:
-    print("value is empty")
-elif data["difficulty"] not in difficulty:
-    print("Wrong difficulty is entered")
+def validate_output(data):
+    if "answer" not in data:
+        print("key not exists")
+        return False
+    elif not data["answer"]:
+        print("value is empty")
+        return False
+    if "topic" not in data:
+        print("Key not exists")
+        return False
+    elif not data["topic"]:
+        print("value is empty")
+        return False
+    if "difficulty" not in data:
+        print("Key not exists")
+        return False
+    elif not data["difficulty"]:
+        print("value is empty")
+        return False
+    elif data["difficulty"] not in difficulty:
+        print("Wrong difficulty is entered")
+        return False
+
+    return True
+
+
