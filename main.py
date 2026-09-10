@@ -50,7 +50,6 @@ def get_ai_response(type_of_model,user_prompt,response_schema, system_instructio
         print(f"Gemini api caused an error is {e}")
         return False, None
 
-
 difficulty ={
     "beginner",
     "intermediate",
@@ -80,7 +79,6 @@ def validate_output(data):
         return False
 
     return True
-
 
 while True:
     print("Hii, i am gemini")
@@ -129,4 +127,3 @@ while True:
 
 with open("conversation_history.json", "w", encoding="utf-8") as json_file:
     json.dump(convo_hist, json_file, indent=4, ensure_ascii=False)
-
