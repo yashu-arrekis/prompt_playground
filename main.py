@@ -127,3 +127,15 @@ while True:
 
 with open("conversation_history.json", "w", encoding="utf-8") as json_file:
     json.dump(convo_hist, json_file, indent=4, ensure_ascii=False)
+
+
+response = client.models.generate_content_stream(
+            model=type_of_model,
+            contents= "system_instructions : \n" + system_instructions + "\nPrevious_chat:\n"+ joined_hist + "\nuser_prompt :\n" + user_prompt,
+            config={
+                "response_mime_type": "application/json",
+                "response_schema" : response_schema
+            }
+        )
+for chunk in response:
+    print(chunk.text)
