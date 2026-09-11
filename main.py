@@ -36,7 +36,7 @@ response_schema ={
 
 def get_ai_response(type_of_model,user_prompt,response_schema, system_instructions, joined_hist):
     try:
-        response = client.models.generate_content(
+        response = client.models.generate_content_stream(
             model=type_of_model,
             contents= "system_instructions : \n" + system_instructions + "\nPrevious_chat:\n"+ joined_hist + "\nuser_prompt :\n" + user_prompt,
             config={
@@ -44,7 +44,11 @@ def get_ai_response(type_of_model,user_prompt,response_schema, system_instructio
                 "response_schema" : response_schema
             }
         )
-        data=json.loads(response.text)
+        coll_str=""
+        for chunk in response:
+            print(chunk.text)
+            coll_str = coll_str + chunk.text
+        data=json.loads(coll_str)
         return True, data
     except Exception as e:
         print(f"Gemini api caused an error is {e}")
@@ -127,15 +131,3 @@ while True:
 
 with open("conversation_history.json", "w", encoding="utf-8") as json_file:
     json.dump(convo_hist, json_file, indent=4, ensure_ascii=False)
-
-
-response = client.models.generate_content_stream(
-            model=type_of_model,
-            contents= "system_instructions : \n" + system_instructions + "\nPrevious_chat:\n"+ joined_hist + "\nuser_prompt :\n" + user_prompt,
-            config={
-                "response_mime_type": "application/json",
-                "response_schema" : response_schema
-            }
-        )
-for chunk in response:
-    print(chunk.text)
