@@ -34,6 +34,11 @@ response_schema ={
         ]
     }
 
+joined_hist = ""
+for convo in convo_hist[-3:]:
+    joined_hist = joined_hist + "User: " + convo.get("user_prompt")
+    joined_hist = joined_hist + "\nAI: " + convo.get("AI_response").get("answer")
+
 def get_ai_response(type_of_model,user_prompt,response_schema, system_instructions, joined_hist):
     try:
         response = client.models.generate_content_stream(
@@ -89,11 +94,6 @@ while True:
     print("To enter prompt select option 1")
     print("To exit select option 2")
     print("To clear convo history select 3")
-
-    joined_hist = ""
-    for convo in convo_hist[-3:]:
-        joined_hist = joined_hist + "User: " + convo.get("user_prompt")
-        joined_hist = joined_hist + "\nAI: " + convo.get("AI_response").get("answer")
     
     try:
         option = int(input("Enter your option: "))
