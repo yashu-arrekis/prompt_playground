@@ -147,3 +147,21 @@ while True:
 with open("conversation_history.json", "w", encoding="utf-8") as json_file:
     json.dump(convo_hist, json_file, indent=4, ensure_ascii=False)
 
+def calculator(num1, operation, num2):
+    if operation == "+":
+        result = num1 + num2
+        return result
+    elif operation == "-":
+        result = num1 - num2
+        return result
+    elif operation == "*":
+        result = num1 * num2
+        return result
+    elif operation == "/":
+        if num2 == 0:
+            return "Enter number >0."
+        else:
+            result = num1 / num2
+            return result
+    else:
+        return "Enter a valid operation."
