@@ -34,17 +34,24 @@ response_schema ={
         ]
     }
 
-joined_hist = ""
+completion =[]
 for convo in convo_hist[-3:]:
-    joined_hist = joined_hist + "User: " + convo.get("user_prompt")
-    joined_hist = joined_hist + "\nAI: " + convo.get("AI_response").get("answer")
+    completion.append({
+        "role" : "user",
+        "content" : convo["user_prompt"]
+    })
+    completion.append({
+        "role" : "model",
+        "content" : convo["AI_response"]["answer"]
+    })
 
-def get_ai_response(type_of_model,user_prompt,response_schema, system_instructions, joined_hist):
+def get_ai_response(type_of_model,response_schema, system_instructions):
     try:
         response = client.models.generate_content_stream(
             model=type_of_model,
-            contents= "system_instructions : \n" + system_instructions + "\nPrevious_chat:\n"+ joined_hist + "\nuser_prompt :\n" + user_prompt,
+            contents=completion,
             config={
+                "system_instruction" : system_instructions,
                 "response_mime_type": "application/json",
                 "response_schema" : response_schema
             }
@@ -103,7 +110,11 @@ while True:
 
     if option ==1:
         user_prompt = input("Enter your prompt: ")
-        is_success, data = get_ai_response(type_of_model, user_prompt, response_schema, system_instructions, joined_hist)
+        completion.append({
+                "role" : "user",
+                "content" : user_prompt
+            })
+        is_success, data = get_ai_response(type_of_model, response_schema, system_instructions)
         if is_success == True:
             print(data["answer"])
             print(data["topic"])
@@ -120,6 +131,10 @@ while True:
         if is_valid == True:
             in_dict["AI_response"] = data
             convo_hist.append(in_dict)
+            completion.append({
+                            "role" : "model",
+                            "content" : convo_hist["AI_response"]["answer"]
+                        })
         else:
             print("Something went wrong in validation")
     elif option == 2:
@@ -131,3 +146,4 @@ while True:
 
 with open("conversation_history.json", "w", encoding="utf-8") as json_file:
     json.dump(convo_hist, json_file, indent=4, ensure_ascii=False)
+
