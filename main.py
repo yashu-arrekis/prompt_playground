@@ -45,6 +45,36 @@ for convo in convo_hist[-3:]:
         "content" : convo["AI_response"]["answer"]
     })
 
+# Calculator tool
+def calculator(num1: float, operation: str, num2: float):
+    """
+    Performs basic arithmetic operations on two numbers.
+    
+    Args:
+        num1: The first number.
+        operation: The mathematical operation to perform. Must be one of: +, -, *, /
+        num2: The second number.
+    """
+
+    if operation == "+":
+        result = num1 + num2
+        return result
+    elif operation == "-":
+        result = num1 - num2
+        return result
+    elif operation == "*":
+        result = num1 * num2
+        return result
+    elif operation == "/":
+        if num2 == 0:
+            return "Enter number >0."
+        else:
+            result = num1 / num2
+            return result
+    else:
+        return "Enter a valid operation."
+
+
 def get_ai_response(type_of_model,response_schema, system_instructions):
     try:
         response = client.models.generate_content_stream(
@@ -53,7 +83,8 @@ def get_ai_response(type_of_model,response_schema, system_instructions):
             config={
                 "system_instruction" : system_instructions,
                 "response_mime_type": "application/json",
-                "response_schema" : response_schema
+                "response_schema" : response_schema,
+                "tools" : [calculator]
             }
         )
         coll_str=""
@@ -146,22 +177,3 @@ while True:
 
 with open("conversation_history.json", "w", encoding="utf-8") as json_file:
     json.dump(convo_hist, json_file, indent=4, ensure_ascii=False)
-
-def calculator(num1, operation, num2):
-    if operation == "+":
-        result = num1 + num2
-        return result
-    elif operation == "-":
-        result = num1 - num2
-        return result
-    elif operation == "*":
-        result = num1 * num2
-        return result
-    elif operation == "/":
-        if num2 == 0:
-            return "Enter number >0."
-        else:
-            result = num1 / num2
-            return result
-    else:
-        return "Enter a valid operation."
