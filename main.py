@@ -94,7 +94,7 @@ def get_ai_response(type_of_model,response_schema, system_instructions):
         )
         coll_str=""
         for chunk in response:
-            print(chunk.text)
+            print(chunk)
             coll_str = coll_str + chunk.text
         data=json.loads(coll_str)
         return True, data
@@ -186,3 +186,16 @@ while True:
 
 with open("conversation_history.json", "w", encoding="utf-8") as json_file:
     json.dump(convo_hist, json_file, indent=4, ensure_ascii=False)
+
+
+
+if response.candidates[0].content.parts[0].function_call:
+    function_call = response.candidates[0].content.parts[0].function_call
+    print(f"Function to call: {function_call.name}")
+    print(f"ID: {function_call.id}")
+    print(f"Arguments: {function_call.args}")
+    #  In a real app, you would call your function here:
+    #  result = get_current_temperature(**function_call.args)
+else:
+    print("No function call found in the response.")
+    print(response.text)
