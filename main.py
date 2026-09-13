@@ -1,4 +1,5 @@
 from google import genai
+from google.genai import types
 import json
 
 client = genai.Client()
@@ -36,14 +37,18 @@ response_schema ={
 
 completion =[]
 for convo in convo_hist[-3:]:
-    completion.append({
-        "role" : "user",
-        "content" : convo["user_prompt"]
-    })
-    completion.append({
-        "role" : "model",
-        "content" : convo["AI_response"]["answer"]
-    })
+    completion.append(
+        types.Content(
+            role="user",
+            parts=[types.Part(text=convo["user_prompt"])]
+        )
+    )
+    completion.append(
+        types.Content(
+            role="model",
+            parts=[types.Part(text=convo["AI_response"]["answer"])]
+        )
+    )
 
 # Calculator tool
 def calculator(num1: float, operation: str, num2: float):
@@ -141,10 +146,12 @@ while True:
 
     if option ==1:
         user_prompt = input("Enter your prompt: ")
-        completion.append({
-                "role" : "user",
-                "content" : user_prompt
-            })
+        completion.append(
+                types.Content(
+                    role="user",
+                    parts=[types.Part(text=user_prompt)]
+                )
+        )
         is_success, data = get_ai_response(type_of_model, response_schema, system_instructions)
         if is_success == True:
             print(data["answer"])
@@ -162,10 +169,12 @@ while True:
         if is_valid == True:
             in_dict["AI_response"] = data
             convo_hist.append(in_dict)
-            completion.append({
-                            "role" : "model",
-                            "content" : convo_hist["AI_response"]["answer"]
-                        })
+            completion.append(
+                types.Content(
+                    role="model",
+                    parts=[types.Part(text=data["answer"])]
+                )
+            )
         else:
             print("Something went wrong in validation")
     elif option == 2:
