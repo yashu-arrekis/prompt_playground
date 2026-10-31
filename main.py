@@ -283,9 +283,23 @@ while True:
 
 def load_pdf(file_path, max_pages = 500, max_size_mb = 50):
 
+    #  CHECK THAT FILE ISN'T NONE
+    if file_path is None:
+        return {"status": "error", "message": "file_path can't be None"}
+    
+    # CHECK THAT FILE_PATH IS A STRING
+    if not isinstance(file_path, str):
+        return {"status": "error", "message": "File path must be a string."}
+
+    # CHECK THAT STRING ISN'T EMPTY STRING OR FILLED WITH SPACES
+    if not file_path.strip():
+        return {"status": "error", "message": "File_path cant be an empty string or with spaces"}
+
     # --- CHECK 1: Basic File Existence ---
-    if not os.path.exists(file_path):
-        return {"status": "error", "message": "File does not exist."}
+    if not os.path.exists(file_path) or not os.path.isfile(file_path):
+        return {"status": "error", "message": "valid file does not exist."}
+    elif not file_path.lower().endswith('.pdf'):
+        return {"status": "error", "message": "Provided file is not a PDF."}
         
     # --- CHECK 2: Max File Size Validation ---
     file_size_mb = os.path.getsize(file_path) / (1024 * 1024)
@@ -310,13 +324,11 @@ def load_pdf(file_path, max_pages = 500, max_size_mb = 50):
     try:
         # --- CHECK 5: Encryption / Password Validation ---
         if doc.is_encrypted:
-            doc.close()
             return {"status": "error", "message": "PDF is password protected or encrypted."}
 
         # --- CHECK 6: Page Count Validation ---
         total_pages = len(doc)
         if total_pages > max_pages:
-            doc.close()
             return {"status": "error", "message": f"Exceeded maximum page limit ({total_pages} pages)."}
 
         pdf_data = []
@@ -328,7 +340,7 @@ def load_pdf(file_path, max_pages = 500, max_size_mb = 50):
             if not text.strip():
                 print(f"Page {page.number + 1} is empty!")
 
-            pdf_data.append((actual_page, text))
+            pdf_data.append({"page_number" : actual_page, "text" : text})
         for page_no, content in pdf_data:
             print(f"Page {page_no} contains {len(content)} characters.")
         return {"status": "success", "data": pdf_data}
