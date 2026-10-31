@@ -283,17 +283,54 @@ while True:
 
 def load_pdf(file_path, max_pages = 500, max_size_mb = 50):
 
-   
-    pdf_data = []
-    for page in doc:
-        actual_page = page.number + 1
-        text = page.get_text()
+    # --- CHECK 1: Basic File Existence ---
+    if not os.path.exists(file_path):
+        return {"status": "error", "message": "File does not exist."}
+        
+    # --- CHECK 2: Max File Size Validation ---
+    file_size_mb = os.path.getsize(file_path) / (1024 * 1024)
+    if file_size_mb > max_size_mb:
+        return {"status": "error", "message": f"File too large ({file_size_mb:.1f}MB)."}
 
-        #Handling empty pages or filled with only digital image
-        if not text.strip():
-            print(f"Page {page.number + 1} is empty!")
+    # --- CHECK 3: Verify Magic Bytes Signature ---
+    try:
+        with open(file_path, "rb") as f:
+            header = f.read(4)
+            if header != b"%PDF":
+                return {"status": "error", "message": "Invalid file type. Not a real PDF."}
+    except Exception as e:
+        return {"status": "error", "message": f"Failed to read file headers: {str(e)}"}
 
-        pdf_data.append((actual_page, text))
-    for page_no, content in pdf_data:
-        print(f"Page {page_no} contains {len(content)} characters.")
-    return 
+    # --- CHECK 4: Safe Opening & Structural Integrity ---
+    try:
+        doc = fitz.open(file_path)
+    except Exception as e:
+        return {"status": "error", "message": f"Corrupted or unreadable PDF: {str(e)}"}
+
+    try:
+        # --- CHECK 5: Encryption / Password Validation ---
+        if doc.is_encrypted:
+            doc.close()
+            return {"status": "error", "message": "PDF is password protected or encrypted."}
+
+        # --- CHECK 6: Page Count Validation ---
+        total_pages = len(doc)
+        if total_pages > max_pages:
+            doc.close()
+            return {"status": "error", "message": f"Exceeded maximum page limit ({total_pages} pages)."}
+
+        pdf_data = []
+        for page in doc:
+            actual_page = page.number + 1
+            text = page.get_text()
+
+            #Handling empty pages or filled with only digital image
+            if not text.strip():
+                print(f"Page {page.number + 1} is empty!")
+
+            pdf_data.append((actual_page, text))
+        for page_no, content in pdf_data:
+            print(f"Page {page_no} contains {len(content)} characters.")
+        return {"status": "success", "data": pdf_data}
+    finally:
+        doc.close()
