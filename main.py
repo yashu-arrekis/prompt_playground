@@ -1,6 +1,8 @@
 from google import genai
 from google.genai import types
 import json
+import fitz
+import os
 
 client = genai.Client()
 
@@ -277,3 +279,21 @@ while True:
 
     else:
         print("Please enter 1, 2, or 3.")
+
+
+def load_pdf(file_path, max_pages = 500, max_size_mb = 50):
+
+   
+    pdf_data = []
+    for page in doc:
+        actual_page = page.number + 1
+        text = page.get_text()
+
+        #Handling empty pages or filled with only digital image
+        if not text.strip():
+            print(f"Page {page.number + 1} is empty!")
+
+        pdf_data.append((actual_page, text))
+    for page_no, content in pdf_data:
+        print(f"Page {page_no} contains {len(content)} characters.")
+    return 
